@@ -153,8 +153,10 @@
     .controls, .editor { padding: 22px; min-width: 0; }
     h2 { margin: 0; font-size: 1.23rem; letter-spacing: -.04em; font-weight: 780; }
     .description, .field-label { margin: 5px 0 0; color: var(--muted); font-size: .85rem; line-height: 1.42; }
-    .strength-scale { --thumb-size: 24px; margin-top: 7px; }
-    .strength-track { position: relative; margin-inline: calc(12.5% - var(--thumb-size) / 2); }
+    .strength-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .strength-readout { color: var(--lime); font-size: .82rem; font-weight: 720; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .strength-scale { --thumb-size: 24px; --strength-edge: 33px; margin-top: 7px; }
+    .strength-track { position: relative; margin-inline: calc(var(--strength-edge) - var(--thumb-size) / 2); }
     .strength-track::before {
       content: '';
       position: absolute;
@@ -173,8 +175,8 @@
     .strength-input::-moz-range-progress { background: transparent; }
     .strength-input::-webkit-slider-thumb { appearance: none; box-sizing: border-box; width: var(--thumb-size); height: var(--thumb-size); border: 2px solid #1b1728; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 1px #d9fa72a6; }
     .strength-input::-moz-range-thumb { box-sizing: border-box; width: var(--thumb-size); height: var(--thumb-size); border: 2px solid #1b1728; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 1px #d9fa72a6; }
-    .strength-marks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .strength-mark { display: grid; grid-template-rows: 13px auto; justify-items: center; align-items: end; gap: 4px; color: #d1c9e2; font-size: .75rem; font-weight: 700; white-space: nowrap; }
+    .strength-marks { position: relative; height: 31px; margin-inline: var(--strength-edge); }
+    .strength-mark { position: absolute; left: var(--position); transform: translateX(-50%); display: grid; grid-template-rows: 13px auto; justify-items: center; align-items: end; gap: 4px; color: #d1c9e2; font-size: .75rem; font-weight: 700; white-space: nowrap; }
     .strength-mark::before { content: ''; width: 5px; height: 4px; border-radius: 2px; background: #a592bf; }
     .strength-mark:nth-child(2)::before { height: 7px; }
     .strength-mark:nth-child(3)::before { height: 10px; }
@@ -231,6 +233,9 @@
     .embedded .primary, .embedded .result { margin-top: 9px; }
     .embedded .result { min-height: 49px; padding-block: 5px; }
     .wheel-compact h1 { display: none; }
+    .wheel-compact .star { display: none; }
+    .wheel-compact .hub::after { content: ''; width: 78%; aspect-ratio: 1; border-radius: 50%; background: url('../assets/images/icons/orbit-wheel.webp') center / cover; }
+    .wheel-compact .result-mark, .wheel-compact .result.settled .result-mark { color: transparent; background: url('../assets/images/icons/lucky-ticket.webp') center / cover; }
     @media (max-width: 880px) {
       .stage { padding-inline: 18px; }
       .star-left { left: -4%; }
@@ -257,7 +262,7 @@
   <main class="layout shell">
     <section class="stage panel" aria-labelledby="wheel-title">
       <h1 id="wheel-title">Give it a spin.</h1>
-      <p class="intro">Tap a slice to aim. A little luck nudges where it lands.</p>
+      <p class="intro">Tap the wheel or press Spin. A little luck nudges where it lands.</p>
       <div class="board">
         <span class="star star-left" aria-hidden="true"></span>
         <span class="star star-right" aria-hidden="true"></span>
@@ -267,16 +272,19 @@
         </button>
         <span class="pointer" aria-hidden="true"></span>
       </div>
-      <p class="stage-note">Tap the centre for a random spin.</p>
+      <p class="stage-note">The pointer picks the landing slice.</p>
       <span class="visually-hidden" id="wheel-options"></span>
     </section>
     <div class="sidebar">
       <section class="controls panel" aria-labelledby="spin-length">
-        <h2 id="spin-length">Spin strength</h2>
-        <p class="description">Drag to set how many full turns the wheel makes.</p>
+        <div class="strength-heading">
+          <h2 id="spin-length">Spin strength</h2>
+          <span class="strength-readout" id="strength-readout" aria-hidden="true"></span>
+        </div>
+        <p class="description">Set the turns before the random nudge.</p>
         <div class="strength-scale">
           <div class="strength-track" id="strength-track">
-            <input type="range" class="strength-input" id="strength" min="0" max="3" step="1" value="2" aria-labelledby="spin-length">
+            <input type="range" class="strength-input" id="strength" min="0.25" max="3" step="0.01" value="2" aria-labelledby="spin-length">
           </div>
           <div class="strength-marks" id="strength-marks" aria-hidden="true"></div>
         </div>
@@ -314,11 +322,11 @@
     const TAU = 2 * Math.PI;
     const defaultOptions = ['Jackpot', 'Mystery', 'Bonus', 'Wild card', 'Pick again', 'Treat', 'Lucky dip', 'Double up'];
     const palette = ['#f8cd69', '#c2a5fa', '#f6a174', '#f6a5ca', '#98dccf', '#a3b3fa', '#d6eb87', '#f389a5'];
-    const lengths = [
-      { value: 'under-1', label: 'Under 1', turns: 0 },
-      { value: '1', label: '1', turns: 1 },
-      { value: '2', label: '2', turns: 2 },
-      { value: '3', label: '3', turns: 3 },
+    const strengthMarkers = [
+      { value: 0.25, label: 'Under 1' },
+      { value: 1, label: '1' },
+      { value: 2, label: '2' },
+      { value: 3, label: '3' },
     ];
     const title = Array.from(config.get('title')?.trim() || '').slice(0, 80).join('');
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -349,20 +357,25 @@
       window.parent.postMessage({ type: `carnival:wheel-${type}`, ...details }, origin);
     }
 
-    const strengthMarks = lengths.map(length => {
+    const minimumStrength = Number(strength.min);
+    const maximumStrength = Number(strength.max);
+    const strengthPercent = value => (value - minimumStrength) / (maximumStrength - minimumStrength) * 100;
+    const strengthMarks = strengthMarkers.map(({ value, label }) => {
       const mark = document.createElement('span');
       mark.className = 'strength-mark';
-      mark.textContent = length.label;
+      mark.textContent = label;
+      mark.style.setProperty('--position', `${strengthPercent(value)}%`);
       return mark;
     });
     byId('strength-marks').append(...strengthMarks);
 
     function syncStrength() {
       const selected = strength.valueAsNumber;
-      const { label, turns } = lengths[selected];
-      strength.setAttribute('aria-valuetext', `${label} full ${turns < 2 ? 'turn' : 'turns'}`);
-      byId('strength-track').style.setProperty('--strength', `${selected / Number(strength.max) * 100}%`);
-      strengthMarks.forEach((mark, index) => mark.classList.toggle('selected', index === selected));
+      const text = `${selected} ${selected === 1 ? 'turn' : 'turns'}`;
+      byId('strength-readout').textContent = text;
+      strength.setAttribute('aria-valuetext', text);
+      byId('strength-track').style.setProperty('--strength', `${strengthPercent(selected)}%`);
+      strengthMarks.forEach((mark, index) => mark.classList.toggle('selected', selected >= strengthMarkers[index].value));
     }
 
     function mod(value, divisor) {
@@ -381,22 +394,14 @@
       return Math.floor(mod(angle - currentRotation + Math.PI / count, TAU) / (TAU / count));
     }
 
-    function randomIndex(count) {
-      return Math.floor(Math.random() * count);
-    }
-
-    function makeSpin(angle, currentRotation, count, fullTurns) {
-      const slice = TAU / count;
-      const base = angle === null ? randomIndex(count) : indexAt(angle, currentRotation, count);
-      const radius = Math.min(2, Math.floor(count / 2));
-      const neighbors = new Set();
-      for (let offset = -radius; offset <= radius; offset++) {
-        neighbors.add(mod(base + offset, count));
-      }
-      const winner = [...neighbors][randomIndex(neighbors.size)];
-      const drift = (Math.random() - .5) * slice * .30;
-      const remainder = mod(-winner * slice - currentRotation + drift, TAU);
-      return { winner, travel: fullTurns * TAU + remainder };
+    function makeSpin(angle, currentRotation, count, turns) {
+      const nominal = turns * TAU;
+      const nudge = Math.min(2 * TAU / count, .28 * TAU);
+      const bias = angle === null ? 0 : .22 * Math.sin(angle);
+      const lower = Math.max(.06 * TAU, nominal - nudge * (1 - Math.max(0, bias)));
+      const upper = nominal + nudge * (1 + Math.min(0, bias));
+      const travel = lower + Math.random() * (upper - lower);
+      return { winner: indexAt(0, currentRotation + travel, count), travel };
     }
 
     function fitLabel(label, maxWidth) {
@@ -476,8 +481,7 @@
 
     function spin(angle = null) {
       if (spinning) return;
-      const length = lengths[strength.valueAsNumber];
-      const { winner, travel } = makeSpin(angle, rotation, options.length, length.turns);
+      const { winner, travel } = makeSpin(angle, rotation, options.length, strength.valueAsNumber);
       const startRotation = rotation;
       const winningLabel = options[winner];
       setSpinning(true);
@@ -555,7 +559,7 @@
       const params = new URLSearchParams(query.join('?'));
       const iframeTitle = title || params.get('title')?.trim() || 'Orbit Wheel';
       for (const key of ['embed', 'turns', 'option', 'title']) params.delete(key);
-      const wheelParams = new URLSearchParams({ embed: '1', turns: lengths[strength.valueAsNumber].value });
+      const wheelParams = new URLSearchParams({ embed: '1', turns: strength.value });
       if (iframeTitle !== 'Orbit Wheel') wheelParams.set('title', iframeTitle);
       for (const option of options) wheelParams.append('option', option);
       const allParams = [...params, ...wheelParams];
@@ -567,8 +571,11 @@
       byId('copy-embed').disabled = false;
     }
 
-    const configuredStrength = lengths.findIndex(item => item.value === config.get('turns'));
-    if (configuredStrength >= 0) strength.valueAsNumber = configuredStrength;
+    const configuredValue = config.get('turns');
+    const configuredStrength = configuredValue === 'under-1' ? .5 : Number(configuredValue);
+    if (configuredStrength >= minimumStrength && configuredStrength <= maximumStrength) {
+      strength.valueAsNumber = Math.round(configuredStrength * 100) / 100;
+    }
     syncStrength();
     strength.addEventListener('input', syncStrength);
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Play | Carnival of Opportunities</title>
-  <meta name="description" content="Play the Carnival of Opportunities wheel, duck pond, peg drop and balloon mixer.">
+  <meta name="description" content="Play a midway game and uncover a destination, prompt or prize at the Carnival of Opportunities.">
   <meta name="theme-color" content="#101020">
   <link rel="canonical" href="https://auraofintelligence.github.io/carnival-of-opportunities/play.html">
   <script>
@@ -16,32 +16,44 @@
       document.head.append(robots);
     }
   </script>
-  <link rel="stylesheet" href="assets/css/site.css">
+  <link rel="stylesheet" href="assets/css/site.css?v=2">
   <link rel="stylesheet" href="assets/css/games.css">
-  <script defer src="assets/js/catalog.js"></script>
-  <script defer src="assets/js/featured.js"></script>
+  <link rel="stylesheet" href="assets/css/table-games.css">
+  <link rel="stylesheet" href="assets/css/aim-games.css">
+  <link rel="stylesheet" href="assets/css/mixer-games.css">
+  <script defer src="assets/js/catalog.js?v=2"></script>
+  <script defer src="assets/js/featured.js?v=2"></script>
   <script defer src="assets/js/games.js"></script>
-  <script defer src="assets/js/player.js"></script>
+  <script defer src="assets/js/table-games.js"></script>
+  <script defer src="assets/js/aim-games.js"></script>
+  <script defer src="assets/js/mixer-games.js"></script>
+  <script defer src="assets/js/player.js?v=2"></script>
+  <script defer src="assets/js/site.js"></script>
 </head>
 <body id="top">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="index.html"><span class="brand-ticket" aria-hidden="true">✦</span><span>Carnival of<br>Opportunities</span></a>
+      <a class="brand" href="index.html"><img class="brand-ticket" src="assets/images/icons/lucky-ticket.webp" alt="" width="45" height="45"><span>Carnival of Opportunities</span></a>
       <nav class="site-nav" aria-label="Primary">
-        <a href="index.html#games" aria-current="page">Games</a>
-        <a href="embed.html">Embed studio</a>
-        <a href="index.html#network">Explore the network</a>
+        <a href="index.html#games" aria-current="page">Midway</a>
+        <a href="embed.html">Embed Studio</a>
+        <a href="index.html#network">Aura Network</a>
       </nav>
-      <a class="aura-link" href="https://auraofintelligence.github.io/">Aura of Intelligence <span aria-hidden="true">↗</span></a>
+      <a class="header-action" href="play.html?game=featured">Today’s game</a>
     </div>
   </header>
   <main id="main" class="container player">
     <div class="page-title player-title">
-      <a class="back-link" href="index.html#games">← All games</a>
-      <h1 id="play-title">Play a game</h1>
-      <p id="play-description"></p>
-      <p class="featured-note" id="featured-note" hidden>Today’s featured game · changes daily in Brisbane</p>
+      <a class="back-link" href="index.html#games">All games</a>
+      <div class="game-title-row">
+        <img class="play-icon" id="play-icon" alt="" width="100" height="100" hidden>
+        <div>
+          <h1 id="play-title">Play a game</h1>
+          <p id="play-description"></p>
+          <p class="featured-note" id="featured-note" hidden>Today’s featured game · changes daily in Brisbane</p>
+        </div>
+      </div>
     </div>
     <div class="player-layout">
       <div class="game-root" id="game-root"></div>
@@ -50,22 +62,29 @@
           <p class="draw-label">Your draw</p>
           <h2 id="draw-name"></h2>
           <p id="draw-prompt" hidden></p>
-          <a class="button button-gold button-small" id="draw-link" target="_blank" rel="noopener noreferrer" hidden>Open destination <span aria-hidden="true">↗</span></a>
+          <a class="button button-gold button-small" id="draw-link" target="_blank" rel="noopener noreferrer" hidden>Open destination</a>
         </div>
-        <div class="aside-card">
+        <a class="aside-card" id="edit-game" href="embed.html">
           <h2>Put this game on a site</h2>
           <p>Choose what people can draw, then copy a ready-to-paste embed.</p>
-          <a class="text-link" id="edit-game" href="embed.html">Open embed studio <span aria-hidden="true">→</span></a>
-        </div>
+          <span class="text-link">Open embed studio</span>
+        </a>
       </aside>
     </div>
     <noscript><p>Enable JavaScript to play this game.</p></noscript>
   </main>
   <footer class="site-footer">
-    <div class="container footer-inner">
-      <div><strong>Carnival of Opportunities</strong><p>Luke Nathan Hayes · Aura of Intelligence</p></div>
-      <nav aria-label="Footer"><a href="sitemap.xml">Site map</a><a href="LICENCE.md">Public Source Licence</a><a href="https://github.com/auraofintelligence/carnival-of-opportunities">Source</a><a href="#top">Top ↑</a></nav>
+    <div class="container">
+      <nav class="page-turns" aria-label="Previous and next pages" data-page="play">
+        <a class="page-turn" rel="prev" href="index.html#games"><span>Previous</span><strong>The Midway</strong></a>
+        <a class="page-turn" rel="next" href="play.html?game=duck-pond"><span>Next</span><strong>Duck Pond</strong></a>
+      </nav>
+      <div class="footer-inner">
+        <div><strong>Carnival of Opportunities</strong><p>Luke Nathan Hayes · Aura of Intelligence</p></div>
+        <nav aria-label="Footer"><a href="https://auraofintelligence.github.io/">Aura of Intelligence</a><a href="sitemap.xml">Site map</a><a href="LICENCE.md">Public Source Licence</a><a href="https://github.com/auraofintelligence/carnival-of-opportunities">Source</a></nav>
+      </div>
     </div>
   </footer>
+  <a class="back-to-top" href="#top" data-to-top hidden>Back to top</a>
 </body>
 </html>

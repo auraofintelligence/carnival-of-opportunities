@@ -7,21 +7,22 @@
   <meta name="description" content="Choose a carnival game, add destinations and actions, and copy an embed or a Codex placement prompt.">
   <meta name="theme-color" content="#101020">
   <link rel="canonical" href="https://auraofintelligence.github.io/carnival-of-opportunities/embed.html">
-  <link rel="stylesheet" href="assets/css/site.css">
-  <script defer src="assets/js/catalog.js"></script>
-  <script defer src="assets/js/studio.js"></script>
+  <link rel="stylesheet" href="assets/css/site.css?v=2">
+  <script defer src="assets/js/catalog.js?v=2"></script>
+  <script defer src="assets/js/studio.js?v=2"></script>
+  <script defer src="assets/js/site.js"></script>
 </head>
 <body id="top">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="index.html"><span class="brand-ticket" aria-hidden="true">✦</span><span>Carnival of<br>Opportunities</span></a>
+      <a class="brand" href="index.html"><img class="brand-ticket" src="assets/images/icons/lucky-ticket.webp" alt="" width="45" height="45"><span>Carnival of Opportunities</span></a>
       <nav class="site-nav" aria-label="Primary">
-        <a href="index.html#games">Games</a>
-        <a href="embed.html" aria-current="page">Embed studio</a>
-        <a href="index.html#network">Explore the network</a>
+        <a href="index.html#games">Midway</a>
+        <a href="embed.html" aria-current="page">Embed Studio</a>
+        <a href="index.html#network">Aura Network</a>
       </nav>
-      <a class="aura-link" href="https://auraofintelligence.github.io/">Aura of Intelligence <span aria-hidden="true">↗</span></a>
+      <a class="header-action" href="play.html?game=featured">Today’s game</a>
     </div>
   </header>
   <main id="main">
@@ -44,10 +45,11 @@
           <textarea id="custom-destinations" rows="6" spellcheck="false" aria-describedby="destination-help"></textarea>
           <div id="strength-fields">
             <label for="custom-strength">Starting wheel strength</label>
-            <select id="custom-strength"><option value="under-1">Under 1 full turn</option><option value="1">1 full turn</option><option value="2" selected>2 full turns</option><option value="3">3 full turns</option></select>
+            <p class="field-help" id="strength-help">Choose between 0.25 and 3 turns. Fractions are welcome.</p>
+            <input id="custom-strength" type="number" min="0.25" max="3" step="0.01" value="2" required aria-describedby="strength-help">
           </div>
           <div id="prompt-fields" hidden>
-            <label for="custom-prompts">Balloon actions</label>
+            <label for="custom-prompts">Actions and prompts</label>
             <p class="field-help" id="prompt-help">Enter 1–24 things people can try at a destination, one per line.</p>
             <textarea id="custom-prompts" rows="4" aria-describedby="prompt-help"></textarea>
           </div>
@@ -71,10 +73,17 @@
     <noscript><p class="container">Enable JavaScript to build an embed.</p></noscript>
   </main>
   <footer class="site-footer">
-    <div class="container footer-inner">
-      <div><strong>Carnival of Opportunities</strong><p>Luke Nathan Hayes · Aura of Intelligence · AI-generated hero art</p></div>
-      <nav aria-label="Footer"><a href="sitemap.xml">Site map</a><a href="LICENCE.md">Public Source Licence</a><a href="https://github.com/auraofintelligence/carnival-of-opportunities">Source</a><a href="#top">Top ↑</a></nav>
+    <div class="container">
+      <nav class="page-turns" aria-label="Previous and next pages" data-page="studio">
+        <a class="page-turn" rel="prev" href="play.html?game=constellation-draw"><span>Previous</span><strong>Constellation Draw</strong></a>
+        <a class="page-turn" rel="next" href="index.html#games"><span>Next</span><strong>The Midway</strong></a>
+      </nav>
+      <div class="footer-inner">
+        <div><strong>Carnival of Opportunities</strong><p>Luke Nathan Hayes · Aura of Intelligence · AI-generated art</p></div>
+        <nav aria-label="Footer"><a href="https://auraofintelligence.github.io/">Aura of Intelligence</a><a href="sitemap.xml">Site map</a><a href="LICENCE.md">Public Source Licence</a><a href="https://github.com/auraofintelligence/carnival-of-opportunities">Source</a></nav>
+      </div>
     </div>
   </footer>
+  <a class="back-to-top" href="#top" data-to-top hidden>Back to top</a>
 </body>
 </html>

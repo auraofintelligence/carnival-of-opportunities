@@ -2,18 +2,20 @@
 
 Small luck games that can lead people to projects, prompts and opportunities across the Aura of Intelligence network. Play on the [midway](https://auraofintelligence.github.io/carnival-of-opportunities/) or make a custom game in the [Embed Studio](https://auraofintelligence.github.io/carnival-of-opportunities/embed.html).
 
-| Game | How it works |
+| Category | Games |
 | --- | --- |
-| **Orbit Wheel** | Set the strength slider to Under 1, 1, 2 or 3 full turns. Press Spin for a random pick or tap a slice to aim with a little drift. |
-| **Duck Pond** | Pick a duck to reveal a hidden destination. Shuffle the pond for another draw. |
-| **Peg Drop** | Choose a release lane and watch the token bounce into a slot. |
-| **Balloon Mixer** | Pop one balloon from each bunch to pair a destination with an action. |
-| **Today’s featured game** | One iframe URL cycles through the catalogue by the Brisbane date. |
+| **Quick picks** | Orbit Wheel, Duck Pond, Lucky Ticket, Coin Toss, Dice Duel, Mystery Doors |
+| **Aim & timing** | Peg Drop, Shell Shuffle, Ring Toss, Coconut Shy, Bell Striker, Prize Crane |
+| **Mixers** | Balloon Mixer, Postcard Pair, Fortune Cookie, Constellation Draw |
+
+Use the midway search or category controls to find a game. The **Previous** and **Next** footer links take you through the catalogue. **Today’s featured game** uses one iframe URL to cycle through all 16 games by the Brisbane date.
+
+The Orbit Wheel’s strength slider moves in 0.01-turn increments from 0.25 to 3 turns. Its four markers show the range. The wheel adds a small random nudge to the selected distance before it lands.
 
 ## Add a game to another site
 
 1. Open **Embed Studio** and choose a game. Give it a custom title if useful.
-2. Enter 2–32 destinations, one per line. Use `Name | https://example.com/page` for a clickable result or enter a plain label for a prize or prompt. Add an action list for the Balloon Mixer and a starting strength for the wheel.
+2. Enter 2–32 destinations, one per line. Use `Name | https://example.com/page` for a clickable result or enter a plain label for a prize or prompt. Add an action list for the mixers and a starting strength for the wheel.
 3. Choose **Update preview** and play a round. Copy the iframe into the destination site’s HTML, or choose **Copy Codex prompt** and tell Codex which site and section to edit.
 
 Each copied iframe carries its own settings in the URL fragment. Keep the full `src` when moving it between sites. The game reveals a link after a draw and lets the visitor decide when to open it.

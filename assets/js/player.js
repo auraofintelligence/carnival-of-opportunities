@@ -4,7 +4,7 @@
   const parameters = new URLSearchParams(location.search);
   const requested = parameters.get('game');
   const rotating = requested === 'featured';
-  const game = Carnival.gameById(rotating ? Carnival.featured().id : requested) || Carnival.games[0];
+  const game = Carnival.gameForRequest(requested);
   const settings = Carnival.readSettings(location.hash);
   const heading = document.querySelector('#play-title');
   const root = document.querySelector('#game-root');
@@ -14,6 +14,11 @@
   const drawLink = document.querySelector('#draw-link');
 
   heading.textContent = settings.title || game.name;
+  if (parameters.get('embed') !== '1') {
+    const icon = document.querySelector('#play-icon');
+    icon.src = Carnival.iconPath(game.id);
+    icon.hidden = false;
+  }
   document.title = `${heading.textContent} | Carnival of Opportunities`;
   document.querySelector('#play-description').textContent = game.description;
   document.querySelector('#featured-note').hidden = !rotating;
@@ -49,7 +54,10 @@
       }
     });
     root.append(frame);
-  } else {
-    CarnivalGames.mount({ id: game.id, root, options: settings.options, prompts: settings.prompts, reveal });
+    return;
   }
+
+  const gameContext = { id: game.id, root, options: settings.options, prompts: settings.prompts, reveal };
+  const mount = globalThis.CarnivalExtras?.[game.id] || CarnivalGames.mount;
+  mount(gameContext);
 })();

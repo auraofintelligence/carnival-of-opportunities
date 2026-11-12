@@ -47,8 +47,9 @@
 
   function updateFields() {
     const id = gamePicker.value;
-    document.querySelector('#prompt-fields').hidden = id !== 'balloon-mixer' && id !== 'featured';
-    document.querySelector('#strength-fields').hidden = id !== 'orbit-wheel' && id !== 'featured';
+    document.querySelector('#prompt-fields').hidden = id !== 'featured' && !Carnival.gameById(id)?.prompts;
+    strengthField.disabled = id !== 'orbit-wheel' && id !== 'featured';
+    document.querySelector('#strength-fields').hidden = strengthField.disabled;
   }
 
   function apply() {
@@ -67,7 +68,7 @@
       return false;
     }
     const title = Carnival.cleanText(titleField.value, 80);
-    const config = { title, options, prompts, turns: strengthField.value };
+    const config = { title, options, prompts, turns: Carnival.startingStrength(strengthField.value) };
     appliedName = title || Carnival.gameById(id)?.name || 'Today’s featured game';
     const publicBase = /^https?:$/.test(location.protocol) ? location.href : Carnival.canonical;
     const url = Carnival.playerUrl(publicBase, id, config);
