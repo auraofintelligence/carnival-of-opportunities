@@ -12,6 +12,7 @@
   const status = document.querySelector('#studio-status');
   const settings = Carnival.readSettings(location.hash);
   let appliedName = '';
+  let previewRevision = 0;
 
   for (const game of Carnival.games) gamePicker.add(new Option(game.name, game.id));
   gamePicker.add(new Option('Today’s featured game', 'featured'));
@@ -73,7 +74,10 @@
     const height = ['orbit-wheel', 'featured'].includes(id) ? 910 : 760;
     preview.title = `Preview of ${appliedName}`;
     preview.height = height;
-    preview.src = Carnival.playerUrl(location.href, id, config).href;
+    const previewUrl = Carnival.playerUrl(location.href, id, config);
+    // Changing only a fragment would leave the previous game instance mounted.
+    previewUrl.searchParams.set('preview', String(++previewRevision));
+    preview.src = previewUrl.href;
     code.value = `<iframe src="${escapeAttribute(url.href)}" title="${escapeAttribute(appliedName)}" width="100%" height="${height}" style="display:block;max-width:680px;border:0" loading="lazy"></iframe>`;
     status.textContent = 'Preview and embed code updated.';
     return true;
