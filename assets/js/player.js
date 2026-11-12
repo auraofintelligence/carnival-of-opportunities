@@ -38,7 +38,7 @@
     const frame = document.createElement('iframe');
     frame.className = 'wheel-frame';
     frame.title = 'Orbit Wheel';
-    const wheelUrl = new URL('games/orbit-wheel.html', location.href);
+    const wheelUrl = new URL('games/orbit-wheel.html?v=2', location.href);
     const wheelSettings = new URLSearchParams({ embed: '1', compact: '1', turns: settings.turns });
     for (const option of settings.options) wheelSettings.append('option', option.label);
     wheelUrl.hash = `wheel?${wheelSettings}`;
