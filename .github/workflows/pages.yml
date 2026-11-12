@@ -1,0 +1,44 @@
+name: Publish Carnival of Opportunities
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # 05:17 in Brisbane the following morning.
+    - cron: '17 19 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - uses: actions/configure-pages@v5
+      - name: Build the public site and daily feature
+        run: node scripts/build.mjs
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+          include-hidden-files: true
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

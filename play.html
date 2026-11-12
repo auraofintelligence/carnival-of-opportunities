@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Play | Carnival of Opportunities</title>
+  <meta name="description" content="Play the Carnival of Opportunities wheel, duck pond, peg drop and balloon mixer.">
+  <meta name="theme-color" content="#101020">
+  <link rel="canonical" href="https://auraofintelligence.github.io/carnival-of-opportunities/play.html">
+  <script>
+    if (new URLSearchParams(location.search).get('embed') === '1') {
+      document.documentElement.classList.add('embedded');
+      const robots = document.createElement('meta');
+      robots.name = 'robots';
+      robots.content = 'noindex, follow';
+      document.head.append(robots);
+    }
+  </script>
+  <link rel="stylesheet" href="assets/css/site.css">
+  <link rel="stylesheet" href="assets/css/games.css">
+  <script defer src="assets/js/catalog.js"></script>
+  <script defer src="assets/js/featured.js"></script>
+  <script defer src="assets/js/games.js"></script>
+  <script defer src="assets/js/player.js"></script>
+</head>
+<body id="top">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html"><span class="brand-ticket" aria-hidden="true">✦</span><span>Carnival of<br>Opportunities</span></a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="index.html#games" aria-current="page">Games</a>
+        <a href="embed.html">Embed studio</a>
+        <a href="index.html#network">Explore the network</a>
+      </nav>
+      <a class="aura-link" href="https://auraofintelligence.github.io/">Aura of Intelligence <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  <main id="main" class="container player">
+    <div class="page-title player-title">
+      <a class="back-link" href="index.html#games">← All games</a>
+      <h1 id="play-title">Play a game</h1>
+      <p id="play-description"></p>
+      <p class="featured-note" id="featured-note" hidden>Today’s featured game · changes daily in Brisbane</p>
+    </div>
+    <div class="player-layout">
+      <div class="game-root" id="game-root"></div>
+      <aside class="play-aside" aria-label="Game result and sharing">
+        <div class="draw" id="draw" aria-live="polite" aria-atomic="true" hidden>
+          <p class="draw-label">Your draw</p>
+          <h2 id="draw-name"></h2>
+          <p id="draw-prompt" hidden></p>
+          <a class="button button-gold button-small" id="draw-link" target="_blank" rel="noopener noreferrer" hidden>Open destination <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="aside-card">
+          <h2>Put this game on a site</h2>
+          <p>Choose what people can draw, then copy a ready-to-paste embed.</p>
+          <a class="text-link" id="edit-game" href="embed.html">Open embed studio <span aria-hidden="true">→</span></a>
+        </div>
+      </aside>
+    </div>
+    <noscript><p>Enable JavaScript to play this game.</p></noscript>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div><strong>Carnival of Opportunities</strong><p>Luke Nathan Hayes · Aura of Intelligence</p></div>
+      <nav aria-label="Footer"><a href="sitemap.xml">Site map</a><a href="LICENCE.md">Public Source Licence</a><a href="https://github.com/auraofintelligence/carnival-of-opportunities">Source</a><a href="#top">Top ↑</a></nav>
+    </div>
+  </footer>
+</body>
+</html>

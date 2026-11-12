@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A little prize wheel you can make your own.">
+  <meta name="robots" content="noindex, follow">
+  <title>Orbit Wheel</title>
+  <script>
+    const config = new URLSearchParams(location.hash.startsWith('#wheel?') ? location.hash.slice(7) : location.search);
+    if (config.get('embed') === '1') {
+      document.documentElement.classList.add('embedded');
+    }
+    if (config.get('compact') === '1') {
+      document.documentElement.classList.add('wheel-compact');
+    }
+  </script>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, system-ui, sans-serif;
+      color: #f7f4ff;
+      background: #11101b;
+      --muted: #b8b3c9;
+      --line: #3e3852;
+      --lime: #d9fa72;
+      --surface: #211d31;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 0;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 43% -35%, #3d2c58 0%, transparent 66%);
+    }
+    button, textarea, input { font: inherit; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
+    [hidden] { display: none !important; }
+    .shell { width: min(100% - 48px, 1160px); margin-inline: auto; }
+    .masthead {
+      min-height: 83px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-block: 12px;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; font-size: 1.02rem; font-weight: 800; letter-spacing: -.035em; }
+    .brand-mark {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 1px solid #787058;
+      border-radius: 10px;
+      color: var(--lime);
+      background: #322d39;
+    }
+    .brand-mark::before {
+      content: '';
+      width: 19px;
+      height: 10px;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      transform: rotate(-37deg);
+    }
+    .brand-mark::after { content: ''; position: absolute; width: 5px; height: 5px; background: currentColor; border-radius: 50%; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.67fr) minmax(320px, 1fr); gap: 18px; padding-bottom: 28px; align-items: start; }
+    .panel { border: 1px solid var(--line); border-radius: 24px; background: var(--surface); }
+    .stage {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 24px 29px;
+      text-align: center;
+      background:
+        radial-gradient(circle at 50% 64%, #473362 0%, transparent 66%),
+        radial-gradient(circle, #bda1de36 1px, transparent 1.4px) 0 0 / 19px 19px,
+        #261e39;
+    }
+    h1 { margin: 0; font-size: clamp(2.5rem, 5.15vw, 4.55rem); line-height: 1.01; letter-spacing: -.08em; font-weight: 850; overflow-wrap: anywhere; }
+    .intro { max-width: 36ch; margin: 12px 0 19px; color: #d4cce3; font-size: .95rem; line-height: 1.45; }
+    .board {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: min(100%, 456px);
+      aspect-ratio: 1;
+      isolation: isolate;
+    }
+    .board::before, .board::after {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      width: 109%;
+      height: 109%;
+      border: 1px solid #c6a4e835;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .board::after { width: 116%; height: 116%; border-style: dashed; border-color: #c6a4e829; }
+    .star { position: absolute; z-index: -1; width: 26px; height: 26px; background: #edb6f7; clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); pointer-events: none; }
+    .star-left { left: -9%; top: 21%; }
+    .star-right { right: -8%; bottom: 19%; width: 35px; height: 35px; background: #d9fa7290; }
+    .wheel {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      aspect-ratio: 1;
+      position: relative;
+      border: 0;
+      border-radius: 50%;
+      padding: 0;
+      background: transparent;
+      color: #f7f4ff;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .wheel[aria-disabled="true"] { cursor: progress; }
+    canvas { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 13px 17px #120e23a6); pointer-events: none; }
+    .hub {
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      width: 15%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 2px solid #f6ebff;
+      box-shadow: 0 0 0 4px #231735, 0 6px 9px #20142f99, inset 0 0 0 4px #45345b;
+      background: #2b1e40;
+      transition: background .18s ease, color .18s ease;
+      pointer-events: none;
+    }
+    .hub::after { content: '✦'; font-size: clamp(1.05rem, 4vw, 2rem); }
+    .wheel:not([aria-disabled="true"]):hover .hub { background: var(--lime); color: #241b30; }
+    .pointer {
+      position: absolute;
+      z-index: 2;
+      top: -1.5%;
+      width: 8%;
+      aspect-ratio: .9;
+      filter: drop-shadow(0 2px 1px #190f2d) drop-shadow(0 4px 5px #140d27a6);
+      pointer-events: none;
+    }
+    .pointer::before { content: ''; display: block; width: 100%; height: 100%; background: #f7f1ff; clip-path: polygon(10% 0, 90% 0, 100% 20%, 56% 95%, 50% 100%, 44% 95%, 0 20%); }
+    .stage-note { margin: 17px 0 0; color: #d4cce3; font-size: .82rem; line-height: 1.4; }
+    .sidebar { display: grid; gap: 14px; min-width: 0; }
+    .controls, .editor { padding: 22px; min-width: 0; }
+    h2 { margin: 0; font-size: 1.23rem; letter-spacing: -.04em; font-weight: 780; }
+    .description, .field-label { margin: 5px 0 0; color: var(--muted); font-size: .85rem; line-height: 1.42; }
+    .strength-scale { --thumb-size: 24px; margin-top: 7px; }
+    .strength-track { position: relative; margin-inline: calc(12.5% - var(--thumb-size) / 2); }
+    .strength-track::before {
+      content: '';
+      position: absolute;
+      inset-inline: calc(var(--thumb-size) / 2);
+      top: 50%;
+      height: 6px;
+      border-radius: 999px;
+      transform: translateY(-50%);
+      background: linear-gradient(90deg, #a9c450 var(--strength, 0%), #554b69 var(--strength, 0%));
+      pointer-events: none;
+    }
+    .strength-input { position: relative; display: block; appearance: none; width: 100%; height: 40px; margin: 0; padding: 0; border: 0; border-radius: 8px; background: transparent; cursor: ew-resize; }
+    .strength-input:disabled { cursor: progress; opacity: .6; }
+    .strength-input::-webkit-slider-runnable-track { height: var(--thumb-size); background: transparent; }
+    .strength-input::-moz-range-track { height: var(--thumb-size); background: transparent; }
+    .strength-input::-moz-range-progress { background: transparent; }
+    .strength-input::-webkit-slider-thumb { appearance: none; box-sizing: border-box; width: var(--thumb-size); height: var(--thumb-size); border: 2px solid #1b1728; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 1px #d9fa72a6; }
+    .strength-input::-moz-range-thumb { box-sizing: border-box; width: var(--thumb-size); height: var(--thumb-size); border: 2px solid #1b1728; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 1px #d9fa72a6; }
+    .strength-marks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .strength-mark { display: grid; grid-template-rows: 13px auto; justify-items: center; align-items: end; gap: 4px; color: #d1c9e2; font-size: .75rem; font-weight: 700; white-space: nowrap; }
+    .strength-mark::before { content: ''; width: 5px; height: 4px; border-radius: 2px; background: #a592bf; }
+    .strength-mark:nth-child(2)::before { height: 7px; }
+    .strength-mark:nth-child(3)::before { height: 10px; }
+    .strength-mark:nth-child(4)::before { height: 13px; }
+    .strength-mark.selected { color: var(--lime); }
+    .strength-mark.selected::before { background: currentColor; }
+    .primary, .quiet {
+      border-radius: 10px;
+      font-weight: 760;
+      line-height: 1.15;
+      transition: background .18s ease, border-color .18s ease;
+    }
+    .primary { width: 100%; margin-top: 13px; padding: 13px 14px; border: 1px solid #e4ff95; background: var(--lime); color: #242818; }
+    .primary:not([aria-disabled="true"]):hover { background: #e8ff9f; }
+    .primary[aria-disabled="true"] { cursor: progress; background: #3e4034; color: #e2edc0; border-color: #727f52; }
+    .quiet { padding: 10px 13px; border: 1px solid #514964; color: #f5efff; background: #302840; font-size: .83rem; }
+    .quiet:not([aria-disabled="true"]):hover { background: #433556; border-color: #8f7ca9; }
+    .quiet[aria-disabled="true"] { cursor: progress; opacity: .7; }
+    .launch-arrow { margin-left: 5px; color: #ccb9e4; }
+    .result { display: flex; align-items: center; gap: 11px; min-height: 66px; margin-top: 13px; padding: 9px 12px; border: 1px solid #4f4265; border-radius: 12px; background: #2b233b; }
+    .result-mark { display: grid; place-items: center; flex: 0 0 36px; height: 36px; border: 1px solid #6e578a; border-radius: 9px; color: #e6c9ff; background: #413255; font-size: 1.18rem; }
+    .result.settled .result-mark { color: #282b1b; background: var(--lime); border-color: var(--lime); }
+    .result-label { display: block; margin-bottom: 2px; color: #cec1df; font-size: .69rem; }
+    .result output { display: block; font-size: 1.05rem; line-height: 1.2; font-weight: 770; overflow-wrap: anywhere; }
+    .editor-header { display: flex; align-items: center; justify-content: space-between; gap: 9px; }
+    .count { flex: none; color: #e5d7f4; font-size: .74rem; font-weight: 650; background: #332943; border: 1px solid #514062; padding: 3px 7px; border-radius: 6px; }
+    textarea, .url-input { width: 100%; display: block; color: #f7f4ff; background: #191625; border: 1px solid #4d435f; border-radius: 10px; padding: 9px 11px; }
+    textarea { line-height: 1.35; font-size: .85rem; resize: vertical; }
+    .options { height: 168px; min-height: 84px; margin-top: 9px; }
+    .editor .quiet { margin-top: 10px; width: 100%; }
+    .feedback { margin: 8px 0 0; color: #f7b8d1; font-size: .8rem; line-height: 1.4; }
+    .feedback.success { color: var(--lime); }
+    dialog { width: min(calc(100% - 28px), 490px); padding: 23px; border: 1px solid #5f5076; border-radius: 18px; background: #252033; color: #f7f4ff; }
+    dialog::backdrop { background: #0a0814bd; }
+    .dialog-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .dialog-close { border: 0; border-radius: 6px; background: transparent; color: #e3d6f4; font-size: 1.35rem; line-height: 1; padding: 5px 8px; }
+    .dialog-close:hover { background: #3b304e; }
+    .dialog-field { display: block; margin: 13px 0 5px; font-size: .84rem; font-weight: 680; }
+    .embed-code { font-family: ui-monospace, monospace; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .embedded body { min-height: 0; background: none; }
+    .embedded .masthead, .embedded .editor { display: none; }
+    .embedded .shell { width: min(100% - 12px, 548px); }
+    .embedded .layout { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 6px 0; }
+    .embedded .stage { padding: 17px 17px 14px; border-radius: 16px; }
+    .embedded h1 { font-size: clamp(1.75rem, 6.5vw, 2.65rem); }
+    .embedded .intro { margin: 6px 0 13px; font-size: .82rem; }
+    .embedded .board { width: min(100%, 368px); }
+    .embedded .stage-note { margin-top: 11px; font-size: .75rem; }
+    .embedded .controls { padding: 13px; border-radius: 16px; }
+    .embedded .controls .description { display: none; }
+    .embedded .strength-scale { margin-top: 3px; }
+    .embedded .strength-input { height: 34px; }
+    .embedded .primary, .embedded .result { margin-top: 9px; }
+    .embedded .result { min-height: 49px; padding-block: 5px; }
+    .wheel-compact h1 { display: none; }
+    @media (max-width: 880px) {
+      .stage { padding-inline: 18px; }
+      .star-left { left: -4%; }
+      .star-right { right: -3%; }
+      .controls, .editor { padding: 17px; }
+    }
+    @media (max-width: 700px) {
+      .shell { width: min(100% - 24px, 490px); }
+      .masthead { min-height: 65px; }
+      .layout { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      .stage { padding: 23px 16px 16px; }
+      .intro { margin-bottom: 15px; font-size: .86rem; }
+      .stage-note { margin-top: 13px; }
+      .sidebar { gap: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header class="masthead shell">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span> Orbit Wheel</div>
+    <button type="button" class="quiet" id="open-embed">Get embed code <span class="launch-arrow" aria-hidden="true">↗</span></button>
+  </header>
+  <main class="layout shell">
+    <section class="stage panel" aria-labelledby="wheel-title">
+      <h1 id="wheel-title">Give it a spin.</h1>
+      <p class="intro">Tap a slice to aim. A little luck nudges where it lands.</p>
+      <div class="board">
+        <span class="star star-left" aria-hidden="true"></span>
+        <span class="star star-right" aria-hidden="true"></span>
+        <button type="button" class="wheel" id="wheel" aria-label="Spin the wheel" aria-describedby="wheel-options">
+          <canvas id="wheel-face" aria-hidden="true"></canvas>
+          <span class="hub" aria-hidden="true"></span>
+        </button>
+        <span class="pointer" aria-hidden="true"></span>
+      </div>
+      <p class="stage-note">Tap the centre for a random spin.</p>
+      <span class="visually-hidden" id="wheel-options"></span>
+    </section>
+    <div class="sidebar">
+      <section class="controls panel" aria-labelledby="spin-length">
+        <h2 id="spin-length">Spin strength</h2>
+        <p class="description">Drag to set how many full turns the wheel makes.</p>
+        <div class="strength-scale">
+          <div class="strength-track" id="strength-track">
+            <input type="range" class="strength-input" id="strength" min="0" max="3" step="1" value="2" aria-labelledby="spin-length">
+          </div>
+          <div class="strength-marks" id="strength-marks" aria-hidden="true"></div>
+        </div>
+        <button type="button" class="primary" id="spin">Spin the wheel</button>
+        <div class="result" id="result">
+          <span class="result-mark" aria-hidden="true">✦</span>
+          <div><span class="result-label">The landing</span><output id="landing" aria-live="polite" aria-atomic="true">Ready to spin</output></div>
+        </div>
+      </section>
+      <section class="editor panel" aria-labelledby="options-title">
+        <form id="options-form">
+          <div class="editor-header"><h2 id="options-title">Wheel options</h2><span class="count" id="option-count"></span></div>
+          <label for="options" class="field-label">One option per line</label>
+          <textarea id="options" class="options" rows="5" spellcheck="false" aria-describedby="options-feedback"></textarea>
+          <button type="submit" class="quiet" id="apply-options">Update wheel</button>
+          <p class="feedback" id="options-feedback" role="status" hidden></p>
+        </form>
+      </section>
+    </div>
+  </main>
+  <dialog id="embed-dialog" aria-labelledby="embed-title">
+    <div class="dialog-header">
+      <h2 id="embed-title">Get embed code</h2>
+      <form method="dialog"><button type="submit" class="dialog-close" aria-label="Close">×</button></form>
+    </div>
+    <p class="description">Upload this HTML file to your site. Enter its address below, then paste the code into your page.</p>
+    <label class="dialog-field" for="embed-url">Wheel URL</label>
+    <input type="text" class="url-input" id="embed-url" autocomplete="off" spellcheck="false">
+    <label class="dialog-field" for="embed-code">Embed code</label>
+    <textarea class="embed-code" id="embed-code" rows="4" readonly></textarea>
+    <button type="button" class="primary" id="copy-embed">Copy embed code</button>
+    <p class="feedback" id="embed-feedback" role="status" hidden></p>
+  </dialog>
+  <script>
+    const TAU = 2 * Math.PI;
+    const defaultOptions = ['Jackpot', 'Mystery', 'Bonus', 'Wild card', 'Pick again', 'Treat', 'Lucky dip', 'Double up'];
+    const palette = ['#f8cd69', '#c2a5fa', '#f6a174', '#f6a5ca', '#98dccf', '#a3b3fa', '#d6eb87', '#f389a5'];
+    const lengths = [
+      { value: 'under-1', label: 'Under 1', turns: 0 },
+      { value: '1', label: '1', turns: 1 },
+      { value: '2', label: '2', turns: 2 },
+      { value: '3', label: '3', turns: 3 },
+    ];
+    const title = Array.from(config.get('title')?.trim() || '').slice(0, 80).join('');
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const byId = id => document.getElementById(id);
+    const wheel = byId('wheel');
+    const canvas = byId('wheel-face');
+    const context = canvas.getContext('2d');
+    const spinButton = byId('spin');
+    const strength = byId('strength');
+    const applyButton = byId('apply-options');
+    const optionsInput = byId('options');
+    const optionsFeedback = byId('options-feedback');
+    const landing = byId('landing');
+    const result = byId('result');
+    const embedDialog = byId('embed-dialog');
+    const embedUrl = byId('embed-url');
+    const embedCode = byId('embed-code');
+    const embedFeedback = byId('embed-feedback');
+
+    let options = cleanOptions(config.getAll('option'));
+    if (!validOptions(options)) options = defaultOptions;
+    let rotation = 0;
+    let spinning = false;
+
+    function reportToCarnival(type, details = {}) {
+      if (config.get('compact') !== '1' || window.parent === window) return;
+      const origin = location.protocol === 'file:' ? '*' : location.origin;
+      window.parent.postMessage({ type: `carnival:wheel-${type}`, ...details }, origin);
+    }
+
+    const strengthMarks = lengths.map(length => {
+      const mark = document.createElement('span');
+      mark.className = 'strength-mark';
+      mark.textContent = length.label;
+      return mark;
+    });
+    byId('strength-marks').append(...strengthMarks);
+
+    function syncStrength() {
+      const selected = strength.valueAsNumber;
+      const { label, turns } = lengths[selected];
+      strength.setAttribute('aria-valuetext', `${label} full ${turns < 2 ? 'turn' : 'turns'}`);
+      byId('strength-track').style.setProperty('--strength', `${selected / Number(strength.max) * 100}%`);
+      strengthMarks.forEach((mark, index) => mark.classList.toggle('selected', index === selected));
+    }
+
+    function mod(value, divisor) {
+      return ((value % divisor) + divisor) % divisor;
+    }
+
+    function cleanOptions(values) {
+      return values.map(value => value.trim()).filter(Boolean);
+    }
+
+    function validOptions(values) {
+      return values.length >= 2 && values.length <= 32 && values.every(value => Array.from(value).length <= 80);
+    }
+
+    function indexAt(angle, currentRotation, count) {
+      return Math.floor(mod(angle - currentRotation + Math.PI / count, TAU) / (TAU / count));
+    }
+
+    function randomIndex(count) {
+      return Math.floor(Math.random() * count);
+    }
+
+    function makeSpin(angle, currentRotation, count, fullTurns) {
+      const slice = TAU / count;
+      const base = angle === null ? randomIndex(count) : indexAt(angle, currentRotation, count);
+      const radius = Math.min(2, Math.floor(count / 2));
+      const neighbors = new Set();
+      for (let offset = -radius; offset <= radius; offset++) {
+        neighbors.add(mod(base + offset, count));
+      }
+      const winner = [...neighbors][randomIndex(neighbors.size)];
+      const drift = (Math.random() - .5) * slice * .30;
+      const remainder = mod(-winner * slice - currentRotation + drift, TAU);
+      return { winner, travel: fullTurns * TAU + remainder };
+    }
+
+    function fitLabel(label, maxWidth) {
+      if (context.measureText(label).width <= maxWidth) return label;
+      const characters = Array.from(label);
+      while (characters.length && context.measureText(characters.join('') + '…').width > maxWidth) characters.pop();
+      return characters.join('').trimEnd() + '…';
+    }
+
+    function drawWheel() {
+      const size = Math.round(wheel.clientWidth * Math.min(devicePixelRatio || 1, 3));
+      if (!size) return;
+      canvas.width = size;
+      canvas.height = size;
+      context.scale(size / 440, size / 440);
+      context.translate(220, 220);
+      const circle = (radius, color) => {
+        context.beginPath();
+        context.arc(0, 0, radius, 0, TAU);
+        context.fillStyle = color;
+        context.fill();
+      };
+      circle(218, '#151020');
+      circle(215, '#77628d');
+      circle(213, '#2a2038');
+      circle(199, '#e0cbef');
+
+      const slice = TAU / options.length;
+      const fontSize = options.length <= 6 ? 21 : options.length <= 12 ? 18 : options.length <= 20 ? 15 : 12;
+      for (const [index, label] of options.entries()) {
+        const center = index * slice - Math.PI / 2;
+        context.beginPath();
+        context.moveTo(0, 0);
+        context.arc(0, 0, 196, center - slice / 2, center + slice / 2);
+        context.closePath();
+        const colorIndex = index === options.length - 1 && index % palette.length === 0 ? 3 : index % palette.length;
+        context.fillStyle = palette[colorIndex];
+        context.fill();
+        context.strokeStyle = '#32213b';
+        context.lineWidth = 1.8;
+        context.stroke();
+
+        context.save();
+        context.rotate(center);
+        context.translate(120, 0);
+        if (Math.cos(center) < -.001) context.rotate(Math.PI);
+        context.fillStyle = '#2c2035';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.font = `800 ${fontSize}px Inter, system-ui, sans-serif`;
+        context.fillText(fitLabel(label, 132), 0, 0);
+        context.restore();
+      }
+
+      const tickCount = Math.max(24, options.length);
+      for (let index = 0; index < tickCount; index++) {
+        const angle = index * TAU / tickCount;
+        context.beginPath();
+        context.arc(206 * Math.sin(angle), -206 * Math.cos(angle), index % 3 === 0 ? 2.05 : 1.28, 0, TAU);
+        context.fillStyle = index % 3 === 0 ? '#f5dba6' : '#a38bbd';
+        context.fill();
+      }
+    }
+
+    function paintRotation(angle) {
+      canvas.style.transform = `rotate(${angle}rad)`;
+    }
+
+    function setSpinning(active) {
+      spinning = active;
+      strength.disabled = active;
+      for (const control of [wheel, spinButton, applyButton]) {
+        control.setAttribute('aria-disabled', String(active));
+      }
+      spinButton.textContent = active ? 'Spinning…' : 'Spin the wheel';
+    }
+
+    function spin(angle = null) {
+      if (spinning) return;
+      const length = lengths[strength.valueAsNumber];
+      const { winner, travel } = makeSpin(angle, rotation, options.length, length.turns);
+      const startRotation = rotation;
+      const winningLabel = options[winner];
+      setSpinning(true);
+      reportToCarnival('start');
+      result.classList.remove('settled');
+      landing.textContent = 'Spinning…';
+
+      function finish() {
+        rotation = mod(startRotation + travel, TAU);
+        paintRotation(rotation);
+        landing.textContent = winningLabel;
+        result.classList.add('settled');
+        setSpinning(false);
+        reportToCarnival('result', { index: winner });
+      }
+
+      if (reducedMotion.matches) {
+        finish();
+        return;
+      }
+
+      const duration = 1250 + 520 * travel / TAU;
+      const startTime = performance.now();
+      function frame(now) {
+        const progress = Math.min(1, (now - startTime) / duration);
+        if (progress === 1 || reducedMotion.matches) {
+          finish();
+          return;
+        }
+        const eased = 1 - (1 - progress) ** 3;
+        paintRotation(startRotation + travel * eased);
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function setFeedback(element, message = '', success = false) {
+      element.textContent = message;
+      element.classList.toggle('success', success);
+      element.hidden = !message;
+    }
+
+    function updateOptions(values) {
+      options = values;
+      optionsInput.value = options.join('\n');
+      byId('option-count').textContent = `${options.length} slices`;
+      byId('wheel-options').textContent = `Wheel options include ${options.join(', ')}.`;
+      rotation = 0;
+      paintRotation(rotation);
+      drawWheel();
+      landing.textContent = 'Ready to spin';
+      result.classList.remove('settled');
+    }
+
+    function escapeAttribute(value) {
+      return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    }
+
+    function updateEmbed() {
+      const address = embedUrl.value.trim();
+      embedCode.value = '';
+      byId('copy-embed').disabled = true;
+      setFeedback(embedFeedback);
+      try {
+        if (!address || !['http:', 'https:'].includes(new URL(address, 'https://example.com/').protocol)) {
+          throw new Error('Invalid wheel URL');
+        }
+      } catch {
+        setFeedback(embedFeedback, 'Enter an HTTPS address or a relative path to the wheel file.');
+        return;
+      }
+
+      const [withoutHash, ...fragment] = address.split('#');
+      const [path, ...query] = withoutHash.split('?');
+      const params = new URLSearchParams(query.join('?'));
+      const iframeTitle = title || params.get('title')?.trim() || 'Orbit Wheel';
+      for (const key of ['embed', 'turns', 'option', 'title']) params.delete(key);
+      const wheelParams = new URLSearchParams({ embed: '1', turns: lengths[strength.valueAsNumber].value });
+      if (iframeTitle !== 'Orbit Wheel') wheelParams.set('title', iframeTitle);
+      for (const option of options) wheelParams.append('option', option);
+      const allParams = [...params, ...wheelParams];
+      const encoded = new URLSearchParams(allParams).toString();
+      const source = encoded.length > 3500
+        ? `${path}${params.size ? '?' + params : ''}#wheel?${wheelParams}`
+        : `${path}?${encoded}${fragment.length ? '#' + fragment.join('#') : ''}`;
+      embedCode.value = `<iframe src="${escapeAttribute(source)}" title="${escapeAttribute(iframeTitle)}" loading="lazy" style="display:block;width:100%;max-width:560px;height:740px;border:0"></iframe>`;
+      byId('copy-embed').disabled = false;
+    }
+
+    const configuredStrength = lengths.findIndex(item => item.value === config.get('turns'));
+    if (configuredStrength >= 0) strength.valueAsNumber = configuredStrength;
+    syncStrength();
+    strength.addEventListener('input', syncStrength);
+
+    if (title) {
+      byId('wheel-title').textContent = title;
+      document.title = title;
+    } else if (document.documentElement.classList.contains('embedded')) {
+      byId('wheel-title').textContent = 'Orbit Wheel';
+    }
+
+    updateOptions(options);
+    new ResizeObserver(drawWheel).observe(wheel);
+    if (config.get('compact') === '1') {
+      const layout = document.querySelector('.layout');
+      new ResizeObserver(() => reportToCarnival('size', { height: layout.getBoundingClientRect().height })).observe(layout);
+    }
+
+    wheel.addEventListener('click', event => {
+      if (event.detail === 0) {
+        spin();
+        return;
+      }
+      const rect = wheel.getBoundingClientRect();
+      const dx = event.clientX - rect.left - rect.width / 2;
+      const dy = event.clientY - rect.top - rect.height / 2;
+      spin(Math.hypot(dx, dy) < rect.width * .085 ? null : Math.atan2(dx, -dy));
+    });
+    spinButton.addEventListener('click', () => spin());
+
+    optionsInput.addEventListener('input', () => setFeedback(optionsFeedback));
+    byId('options-form').addEventListener('submit', event => {
+      event.preventDefault();
+      if (spinning) return;
+      const draft = cleanOptions(optionsInput.value.split(/\r?\n/));
+      if (!validOptions(draft)) {
+        setFeedback(optionsFeedback, 'Use 2–32 options with up to 80 characters each.');
+        return;
+      }
+      updateOptions(draft);
+      setFeedback(optionsFeedback, 'Wheel updated.', true);
+    });
+
+    byId('open-embed').addEventListener('click', () => {
+      if (!embedUrl.value) {
+        embedUrl.value = /^https?:$/.test(location.protocol) ? location.origin + location.pathname : 'orbit-wheel.html';
+      }
+      updateEmbed();
+      embedDialog.showModal();
+    });
+    embedUrl.addEventListener('input', updateEmbed);
+    byId('copy-embed').addEventListener('click', async () => {
+      if (!embedCode.value) return;
+      try {
+        await navigator.clipboard.writeText(embedCode.value);
+      } catch {
+        embedCode.select();
+        if (!document.execCommand('copy')) {
+          setFeedback(embedFeedback, 'The code is selected. Copy it with your browser’s Copy command.');
+          return;
+        }
+      }
+      setFeedback(embedFeedback, 'Embed code copied.', true);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carnival of Opportunities | Aura of Intelligence</title>
+  <meta name="description" content="A midway of small, embeddable luck games that send people somewhere unexpected across the Aura of Intelligence network.">
+  <meta name="theme-color" content="#101020">
+  <link rel="canonical" href="https://auraofintelligence.github.io/carnival-of-opportunities/">
+  <meta property="og:title" content="Carnival of Opportunities">
+  <meta property="og:description" content="Spin, pick, drop or mix your way into an idea you might have missed.">
+  <meta property="og:image" content="https://auraofintelligence.github.io/carnival-of-opportunities/assets/images/carnival-hero.webp">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script defer src="assets/js/catalog.js"></script>
+  <script defer src="assets/js/featured.js"></script>
+  <script defer src="assets/js/home.js"></script>
+</head>
+<body id="top">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-current="page"><span class="brand-ticket" aria-hidden="true">✦</span><span>Carnival of<br>Opportunities</span></a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="#games">Games</a>
+        <a href="embed.html">Embed studio</a>
+        <a href="#network">Explore the network</a>
+      </nav>
+      <a class="aura-link" href="https://auraofintelligence.github.io/">Aura of Intelligence <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero home-hero" aria-labelledby="home-title">
+      <div class="container hero-content">
+        <h1 id="home-title">Carnival of<br>Opportunities<span>.</span></h1>
+        <p>Spin, pick, drop or mix your way into an idea you might have missed. Every game can open a different door across the Aura of Intelligence network.</p>
+        <div class="actions">
+          <a class="button button-gold" href="#games">Explore the games <span aria-hidden="true">↓</span></a>
+          <a class="button button-quiet" href="embed.html">Build an embed <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+    <div class="container">
+      <section class="daily-ticket" aria-labelledby="daily-heading">
+        <div class="daily-icon" aria-hidden="true">✦</div>
+        <div>
+          <h2 id="daily-heading">Today’s featured game</h2>
+          <p><strong id="daily-name">Try today’s draw</strong> <span id="daily-date"></span></p>
+        </div>
+        <a class="button button-small button-quiet" href="play.html?game=featured">Play today’s game <span aria-hidden="true">→</span></a>
+      </section>
+      <section class="section" id="games" aria-labelledby="games-heading">
+        <div class="section-heading">
+          <h2 id="games-heading">The midway</h2>
+          <p>Try a game, then swap in your own destinations, prompts or prizes.</p>
+        </div>
+        <ul class="game-list" id="game-list"></ul>
+        <noscript><p>Enable JavaScript to play Orbit Wheel, Duck Pond, Peg Drop and Balloon Mixer.</p></noscript>
+        <template id="game-card">
+          <li class="game-card">
+            <div class="game-art" aria-hidden="true"></div>
+            <div class="game-card-body">
+              <span class="game-type"></span>
+              <h3></h3>
+              <p></p>
+              <a class="text-link" href="play.html">Play <span aria-hidden="true">→</span></a>
+            </div>
+          </li>
+        </template>
+      </section>
+      <section class="section network-section" id="network" aria-labelledby="network-heading">
+        <div class="section-heading">
+          <h2 id="network-heading">Explore the network</h2>
+          <p>These are some of the places you can land in the starter games.</p>
+        </div>
+        <div class="network-links" id="network-links"></div>
+      </section>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div><strong>Carnival of Opportunities</strong><p>Luke Nathan Hayes · Aura of Intelligence · AI-generated hero art</p></div>
+      <nav aria-label="Footer"><a href="sitemap.xml">Site map</a><a href="LICENCE.md">Public Source Licence</a><a href="https://github.com/auraofintelligence/carnival-of-opportunities">Source</a><a href="#top">Top ↑</a></nav>
+    </div>
+  </footer>
+</body>
+</html>

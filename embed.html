@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Embed Studio | Carnival of Opportunities</title>
+  <meta name="description" content="Choose a carnival game, add destinations and actions, and copy an embed or a Codex placement prompt.">
+  <meta name="theme-color" content="#101020">
+  <link rel="canonical" href="https://auraofintelligence.github.io/carnival-of-opportunities/embed.html">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script defer src="assets/js/catalog.js"></script>
+  <script defer src="assets/js/studio.js"></script>
+</head>
+<body id="top">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html"><span class="brand-ticket" aria-hidden="true">✦</span><span>Carnival of<br>Opportunities</span></a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="index.html#games">Games</a>
+        <a href="embed.html" aria-current="page">Embed studio</a>
+        <a href="index.html#network">Explore the network</a>
+      </nav>
+      <a class="aura-link" href="https://auraofintelligence.github.io/">Aura of Intelligence <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero workshop-hero" aria-labelledby="studio-title">
+      <div class="container hero-content">
+        <h1 id="studio-title">Embed studio<span>.</span></h1>
+        <p>Pick a game and decide where it can send people. Copy the iframe for your site or a ready-to-use prompt for Codex.</p>
+      </div>
+    </section>
+    <div class="container studio-layout">
+      <section class="studio-panel" aria-labelledby="configure-heading">
+        <h2 id="configure-heading">Configure your game</h2>
+        <form id="embed-form">
+          <label for="game-picker">Game</label>
+          <select id="game-picker"></select>
+          <label for="custom-title">Game title <span>(optional)</span></label>
+          <input id="custom-title" type="text" maxlength="80" placeholder="Pick a project to explore">
+          <label for="custom-destinations">Destinations</label>
+          <p class="field-help" id="destination-help">Enter 2–32 destinations, one per line. Use <code>Name | https://your-site</code> to add a link, or enter a name by itself.</p>
+          <textarea id="custom-destinations" rows="6" spellcheck="false" aria-describedby="destination-help"></textarea>
+          <div id="strength-fields">
+            <label for="custom-strength">Starting wheel strength</label>
+            <select id="custom-strength"><option value="under-1">Under 1 full turn</option><option value="1">1 full turn</option><option value="2" selected>2 full turns</option><option value="3">3 full turns</option></select>
+          </div>
+          <div id="prompt-fields" hidden>
+            <label for="custom-prompts">Balloon actions</label>
+            <p class="field-help" id="prompt-help">Enter 1–24 things people can try at a destination, one per line.</p>
+            <textarea id="custom-prompts" rows="4" aria-describedby="prompt-help"></textarea>
+          </div>
+          <button type="submit" class="button button-gold">Update preview</button>
+        </form>
+        <div class="code-panel">
+          <label for="embed-code">Embed code</label>
+          <textarea id="embed-code" class="code-output" rows="4" readonly spellcheck="false"></textarea>
+          <div class="actions">
+            <button type="button" class="button button-small button-quiet" id="copy-iframe">Copy iframe</button>
+            <button type="button" class="button button-small button-quiet" id="copy-brief">Copy Codex prompt</button>
+          </div>
+        </div>
+        <p id="studio-status" class="field-help" role="status"></p>
+      </section>
+      <section class="studio-preview" aria-labelledby="preview-heading">
+        <div class="preview-heading"><h2 id="preview-heading">Preview</h2><p>Play it here before adding it to a site.</p></div>
+        <iframe id="preview" title="Game preview" width="100%" height="910"></iframe>
+      </section>
+    </div>
+    <noscript><p class="container">Enable JavaScript to build an embed.</p></noscript>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div><strong>Carnival of Opportunities</strong><p>Luke Nathan Hayes · Aura of Intelligence · AI-generated hero art</p></div>
+      <nav aria-label="Footer"><a href="sitemap.xml">Site map</a><a href="LICENCE.md">Public Source Licence</a><a href="https://github.com/auraofintelligence/carnival-of-opportunities">Source</a><a href="#top">Top ↑</a></nav>
+    </div>
+  </footer>
+</body>
+</html>
